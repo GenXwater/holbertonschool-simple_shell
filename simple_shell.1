@@ -1,0 +1,121 @@
+.TH SIMPLE_SHELL 1 "August 2024" "1.0" "Simple Shell Manual"
+
+.SH NAME
+simple_shell \- A simple shell implementation in C
+
+.SH SYNOPSIS
+.B simple_shell
+.RI [options]
+
+.SH DESCRIPTION
+.B simple_shell
+is a basic shell that allows the execution of commands with their full path, manages environment variables, and supports a few built-in commands.
+
+.SH FEATURES
+The
+.B simple_shell
+supports the following features:
+
+.IP \[bu] 2
+Execute commands with their full path.
+.IP \[bu] 2
+Manipulate environment variables with built-in commands like
+.BR printenv ,
+.BR setenv ,
+and
+.BR unsetenv .
+.IP \[bu] 2
+Display directories in the PATH environment variable with the
+.B showpath
+command.
+
+.SH COMMANDS
+The following commands are built into the
+.B simple_shell
+:
+
+.TP
+.B printenv
+Prints all the current environment variables.
+
+.TP
+.B setenv
+.BR "setenv " "VAR_NAME VAR_VALUE"
+Sets or updates the value of the environment variable
+.I VAR_NAME
+to
+.I VAR_VALUE
+.
+
+.TP
+.B unsetenv
+.BR "unsetenv " "VAR_NAME"
+Removes the environment variable
+.I VAR_NAME
+from the environment.
+
+.TP
+.B showpath
+Displays all directories in the PATH environment variable, one per line.
+
+.TP
+.B exit
+Exits the shell.
+
+.SH EXAMPLES
+Here are some examples of how to use
+.B simple_shell
+:
+
+.TP
+Execute a command with its full path:
+
+.nf
+$ /bin/ls
+.fi
+
+.TP
+Set an environment variable:
+
+.nf
+$ setenv MY_VAR HelloWorld
+.fi
+
+.TP
+Display all environment variables:
+
+.nf
+$ printenv
+.fi
+
+.TP
+Remove an environment variable:
+
+.nf
+$ unsetenv MY_VAR
+.fi
+
+.TP
+Display directories in the PATH:
+
+.nf
+$ showpath
+.fi
+
+.TP
+Exit the shell:
+
+.nf
+$ exit
+.fi
+
+.SH AUTHOR
+.B simple_shell
+was developed by
+.BR "Nah, evrade10, GenXwater" .
+
+.SH COPYRIGHT
+This manual page is part of the
+.B simple_shell
+project and is distributed under the MIT License.
+
