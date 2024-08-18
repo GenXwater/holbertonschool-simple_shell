@@ -1,113 +1,48 @@
 #include "main.h"
 
 /**
- * main - Entry point of the simple shell
- * @argc: Argument count
- * @argv: Argument vector
- * @envp: Environment variables
+ * main - Simple shell that executes commands
  *
  * Return: Always 0.
  */
-int main(int argc, char *argv[], char *envp[])
+int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t nread;
-	char *cmd_argv[10];
-	int max_args = 10;
-
-	(void)argc;  /* Marking unused parameters */
-	(void)argv;
+	char *argv[2];
 
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");  /* Display prompt in interactive mode */
+		printf("#cisfun$ "); /* Affiche le prompt */
+		nread = getline(&line, &len, stdin); /* Lit l'entrée utilisateur */
 
-		nread = getline(&line, &len, stdin);
-		if (nread == -1)
+		if (nread == -1) /* Handle end-of-file condition (Ctrl+D) */
 		{
-			if (isatty(STDIN_FILENO))
-				printf("\n");  /* Print newline in interactive mode */
-			break;
+			free(line);
+			exit(0);
 		}
 
-		line[strcspn(line, "\n")] = 0;  /* Remove the newline character */
-		split_string_to_av(line, cmd_argv, max_args);
+		line[strcspn(line, "\n")] = 0; /* Retire le caractère de nouvelle ligne */
 
-		if (cmd_argv[0] == NULL)
+		if (strlen(line) == 0) /* Si l'utilisateur appuie juste sur "Entrée", affiche à nouveau le prompt */
 			continue;
 
-		if (handle_builtin_commands(cmd_argv, envp) == 1)
-			continue;
+		argv[0] = line;
+		argv[1] = NULL;
 
-		execute_command(cmd_argv, envp);
+		if (fork() == 0) /* Crée un processus enfant pour exécuter la commande */
+		{
+			execve(argv[0], argv, NULL); /* Remplace le processus enfant par le nouveau programme */
+			perror("./shell"); /* Si execve échoue, affiche une erreur */
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			wait(NULL); /* Le processus parent attend que l'enfant termine */
+		}
 	}
 
 	free(line);
 	return (0);
 }
-
-/**
- * handle_builtin_commands - Handles the built-in commands for the shell
- * @cmd_argv: Array of command arguments
- * @envp: Environment variables
- *
- * Return: 1 if a built-in command was executed, 0 otherwise
- */
-int handle_builtin_commands(char *cmd_argv[], char *envp[])
-{
-	if (strcmp(cmd_argv[0], "exit") == 0)
-	{
-		exit(0);
-	}
-	else if (strcmp(cmd_argv[0], "printenv") == 0)
-	{
-		print_environment(envp);
-		return (1);
-	}
-	else if (strcmp(cmd_argv[0], "setenv") == 0 && cmd_argv[1] && cmd_argv[2])
-	{
-		_setenv(cmd_argv[1], cmd_argv[2], 1, envp);
-		return (1);
-	}
-	else if (strcmp(cmd_argv[0], "unsetenv") == 0 && cmd_argv[1])
-	{
-		_unsetenv(cmd_argv[1], envp);
-		return (1);
-	}
-	else if (strcmp(cmd_argv[0], "showpath") == 0)
-	{
-		print_path_directories(envp);
-		return (1);
-	}
-	else if (strcmp(cmd_argv[0], "man") == 0 && cmd_argv[1] &&
-			strcmp(cmd_argv[1], "simple_shell") == 0)
-	{
-		char *man_command[] = {"/bin/man", "./simple-shell.1", NULL};
-
-		execute_man_command(man_command);
-		return (1);
-	}
-
-	return (0);
-}
-
-/**
- * execute_man_command - Executes the man command
- * @man_command: Array containing the man command and its arguments
- */
-void execute_man_command(char *man_command[])
-{
-	if (fork() == 0)
-	{
-		execvp(man_command[0], man_command);
-		perror("execvp");
-		exit(EXIT_FAILURE);
-	}
-	else
-	{
-		wait(NULL);
-	}
-}
-
