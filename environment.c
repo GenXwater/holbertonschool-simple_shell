@@ -1,65 +1,110 @@
-#include "shell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "main.h"
 
 /**
- * check_builtin - Checks if an input is a builtin command and executes it if so.
+ * _getenv - Custom function to get the value of an environment variable
+ * @name: Name of the environment variable
+ * @envp: Environment variables
  *
- * @arg: The command to be checked and executed if it's a builtin command.
- * @temp: Buffer containing the command.
- *
- * Return: 1 if a builtin command is executed, 0 otherwise.
+ * Return: Pointer to the value of the environment variable, or NULL if not found
  */
-int check_builtin(char **arg, char *temp)
+char *_getenv(const char *name, char *envp[])
 {
-    if (!*arg)
-        return 0;
+	int i = 0;
+	size_t len = strlen(name);
 
-    if (strcmp(*arg, "exit") == 0)
-    {
-        exit_func(arg, temp);
-        return 1;
-    }
-    else if (strcmp(*arg, "env") == 0 || strcmp(*arg, "printenv") == 0)
-    {
-        printenv_func(arg, temp);
-        return 1;
-    }
-
-    return 0;
+	while (envp[i])
+	{
+		if (strncmp(envp[i], name, len) == 0 && envp[i][len] == '=')
+		{
+			return (envp[i] + len + 1);
+		}
+		i++;
+	}
+	return (NULL);
 }
 
 /**
- * exit_func - Builtin command that exits the shell after cleaning the memory.
- *
- * @arg: Arguments to be cleaned before exit.
- * @temp: Buffer to be cleaned before exit.
+ * print_environment - Prints all environment variables
+ * @envp: Environment variables
  */
-void exit_func(char **arg, char *temp)
+void print_environment(char *envp[])
 {
-    clean(temp, arg);
-    exit(0);
+	int i = 0;
+
+	while (envp[i])
+	{
+		printf("%s\n", envp[i]);
+		i++;
+	}
 }
 
 /**
- * printenv_func - Builtin command that prints the current environment of the process.
+ * _setenv - Custom implementation of setenv
+ * @name: Name of the environment variable
+ * @value: Value of the environment variable
+ * @overwrite: Flag to indicate if existing value should be overwritten
+ * @envp: Environment variables
  *
- * @arg: Not used.
- * @temp: Not used.
+ * Return: 0 on success, -1 on failure
  */
-void printenv_func(char **arg, char *temp)
+int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 {
-    extern char **environ;
-    char **env = environ;
+	int i = 0;
+	size_t len = strlen(name);
+	char *new_env;
 
-    (void)arg;
-    (void)temp;
+	while (envp[i])
+	{
+		if (strncmp(envp[i], name, len) == 0 && envp[i][len] == '=')
+		{
+			if (!overwrite)
+				return (0);
 
-    while (*env)
-    {
-        printf("%s\n", *env);
-        env++;
-    }
+			free(envp[i]);
+			break;
+		}
+		i++;
+	}
+
+	new_env = malloc(strlen(name) + strlen(value) + 2);
+	if (!new_env)
+		return (-1);
+
+	sprintf(new_env, "%s=%s", name, value);
+	envp[i] = new_env;
+	envp[i + 1] = NULL;
+
+	printf("Environment variable %s set to %s\n", name, value);
+
+	return (0);
 }
 
+/**
+ * _unsetenv - Custom implementation of unsetenv
+ * @name: Name of the environment variable to remove
+ * @envp: Environment variables
+ *
+ * Return: 0 on success, -1 on failure
+ */
+int _unsetenv(const char *name, char *envp[])
+{
+	int i = 0;
+	size_t len = strlen(name);
+
+	while (envp[i])
+	{
+		if (strncmp(envp[i], name, len) == 0 && envp[i][len] == '=')
+		{
+			free(envp[i]);
+			while (envp[i])
+			{
+				envp[i] = envp[i + 1];
+				i++;
+			}
+			printf("Environment variable %s removed\n", name);
+			return (0);
+		}
+		i++;
+	}
+	return (-1);
+}
