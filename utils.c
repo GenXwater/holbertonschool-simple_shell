@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * print_path_directories - Prints each directory in the PATH environment variable
+ * print_path_directories - Prints each directory in the PATH envnt variable
  * @envp: Environment variables
  */
 void print_path_directories(char *envp[])
@@ -21,7 +21,7 @@ void print_path_directories(char *envp[])
 		dir = strtok(NULL, ":");
 	}
 
-	free(path);
+	free(path);  /* Free the duplicated string */
 }
 
 /**
@@ -47,7 +47,8 @@ list_t *build_path_list(char *envp[])
 		new_node = malloc(sizeof(list_t));
 		if (!new_node)
 		{
-			free_list(head);
+			free_list(head);  /* Free previously allocated nodes */
+			free(path);
 			return (NULL);
 		}
 
@@ -68,7 +69,7 @@ list_t *build_path_list(char *envp[])
 }
 
 /**
- * free_list - Frees a linked list of directories
+ * free_list - Frees a linked list
  * @head: Pointer to the head of the list
  */
 void free_list(list_t *head)
