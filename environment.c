@@ -74,8 +74,6 @@ int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 	envp[i] = new_env;
 	envp[i + 1] = NULL;
 
-	printf("Environment variable %s set to %s\n", name, value);
-
 	return (0);
 }
 
@@ -101,7 +99,6 @@ int _unsetenv(const char *name, char *envp[])
 				envp[i] = envp[i + 1];
 				i++;
 			}
-			printf("Environment variable %s removed\n", name);
 			return (0);
 		}
 		i++;
