@@ -1,49 +1,60 @@
-#include stdio.h
-#include stdlib.h
-#include string.h
-
-#define MAX_TOK 64  // Nombre maximum de tokens, ajustez si nécessaire
+#include "main.h"
 
 /**
- * tokenizer - Divise une chaîne d'entrée en un tableau de tokens en utilisant un délimiteur.
+ * split_string_to_av - Splits a string into an array of words
+ * @str: The string to split
+ * @argv: The array to store the words
+ * @max_args: Maximum number of arguments
  *
- * @temp: Tampon contenant la chaîne à tokeniser.
- * @delim: Délimiteur utilisé pour séparer les tokens.
- *
- * Return: Tableau de chaînes contenant les tokens, ou NULL en cas d'erreur.
+ * Description: Uses strtok to split the input string into words, storing each
+ * word in the argv array. The function limits the number of arguments to
+ * max_args - 1 to leave space for a NULL terminator.
  */
-char **tokenizer(char *temp, const char *delim)
+void split_string_to_av(char *str, char *argv[], int max_args)
 {
-    char **args = NULL;
-    char *token;
-    int i = 0;
+	int i = 0;
+	char *token;
 
-    if (!temp || !delim)
-        return NULL;
+	token = strtok(str, " \t\n");
+	while (token && i < max_args - 1)
+	{
+		argv[i] = token;
+		i++;
+		token = strtok(NULL, " \t\n");
+	}
+	argv[i] = NULL;
+}
 
-    // Allouer la mémoire pour le tableau de tokens
-    args = malloc(sizeof(char *) * MAX_TOK);
-    if (!args)
-        return NULL;
+/**
+ * execute_command - Executes a command with its arguments
+ * @argv: Array of command and arguments
+ * @envp: Environment variables
+ *
+ * Description: This function forks a process and executes a command using
+ * execve. The parent process waits for the child to finish.
+ */
+void execute_command(char *argv[], char *envp[])
+{
+	pid_t pid;
+	int status;
 
-    // Diviser la chaîne en tokens
-    token = strtok(temp, delim);
-    while (token && i < MAX_TOK - 1)
-    {
-        args[i] = strdup(token);
-        if (!args[i])
-        {
-            // En cas d'échec d'allocation, libérer la mémoire et retourner NULL
-            for (int j = 0; j < i; j++)
-                free(args[j]);
-            free(args);
-            return NULL;
-        }
-        i++;
-        token = strtok(NULL, delim);
-    }
-    // Ajouter un pointeur NULL à la fin du tableau
-    args[i] = NULL;
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return;
+	}
 
-    return args;
+	if (pid == 0)
+	{
+		if (execve(argv[0], argv, envp) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		wait(&status);
+	}
 }
