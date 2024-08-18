@@ -12,8 +12,8 @@
 
 typedef struct list_s
 {
-	char *dir;
-	struct list_s *next;
+    char *dir;
+    struct list_s *next;
 } list_t;
 
 void split_string_to_av(char *str, char *argv[], int max_args);
