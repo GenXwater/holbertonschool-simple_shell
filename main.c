@@ -16,7 +16,7 @@ int main(int argc, char *argv[], char *envp[])
 	char *cmd_argv[10];
 	int max_args = 10;
 
-	(void)argc;  /* Marking unused parameters */
+	(void)argc;
 	(void)argv;
 
 	while (1)
@@ -136,22 +136,5 @@ void display_man_page(const char *filename)
 	}
 
 	close(fd);
-}
-
-/**
- * free_resources - Free allocated resources
- * @cmd_argv: Array of command arguments
- * @line: Input line to be freed
- */
-void free_resources(char *cmd_argv[], char *line)
-{
-	int i;
-
-	for (i = 0; cmd_argv[i]; i++)
-	{
-		free(cmd_argv[i]);
-	}
-
-	free(line);
 }
 
