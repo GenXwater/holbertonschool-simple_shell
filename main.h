@@ -1,7 +1,6 @@
-
 #ifndef MAIN_H
 #define MAIN_H
-/* Standard libraries */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,13 +9,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-/* Definition of list_t struct */
+
 typedef struct list_s
 {
-    char *dir;
-    struct list_s *next;
+	char *dir;
+	struct list_s *next;
 } list_t;
-/* Function prototypes */
+
 void split_string_to_av(char *str, char *argv[], int max_args);
 char *_getenv(const char *name, char *envp[]);
 void print_path_directories(char *envp[]);
@@ -27,5 +26,10 @@ void execute_command(char *argv[], char *envp[]);
 void print_environment(char *envp[]);
 void get_process_ids(void);
 void fork_and_wait(void);
-void display_man_page(void);
+void display_man_page(const char *filename);
+int handle_builtin_commands(char *cmd_argv[], char *envp[]);
+void execute_man_command(char *man_command[]);
+void free_resources(char *cmd_argv[], char *line);
+
 #endif /* MAIN_H */
+

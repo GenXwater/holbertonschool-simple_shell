@@ -52,7 +52,7 @@ Ce projet est une implémentation simplifiée d'un shell en C. Un shell est une 
 ### Exemples de commandes
 
 - **Exécuter une commande avec son chemin complet** :
-  
+
   ```bash
   $ /bin/ls
   ```
