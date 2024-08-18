@@ -5,7 +5,7 @@
  * @name: Name of the environment variable
  * @envp: Environment variables
  *
- * Return: Pointer to the value of the environment variable, or NULL if not found
+ * Return: Pointer to the value of the envrnmt variable or NULL if not found
  */
 char *_getenv(const char *name, char *envp[])
 {
@@ -14,7 +14,8 @@ char *_getenv(const char *name, char *envp[])
 
 	while (envp[i])
 	{
-		if (strncmp(envp[i], name, len) == 0 && envp[i][len] == '=')
+		if (strncmp(envp[i], name, len) == 0 &&
+				envp[i][len] == '=')
 		{
 			return (envp[i] + len + 1);
 		}
@@ -105,4 +106,3 @@ int _unsetenv(const char *name, char *envp[])
 	}
 	return (-1);
 }
-

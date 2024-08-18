@@ -10,10 +10,18 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+/**
+ * struct list_s - Singly linked list
+ * @dir: Directory path
+ * @next: Points to the next node
+ *
+ * Description: singly linked list node structure
+ * for storing directories in PATH
+ */
 typedef struct list_s
 {
-    char *dir;
-    struct list_s *next;
+	char *dir;
+	struct list_s *next;
 } list_t;
 
 void split_string_to_av(char *str, char *argv[], int max_args);
@@ -30,5 +38,6 @@ void display_man_page(const char *filename);
 int handle_builtin_commands(char *cmd_argv[], char *envp[]);
 void execute_man_command(char *man_command[]);
 void free_list(list_t *head);
+void execute_child_process(char *full_path, char *argv[], char *envp[]);
 
 #endif

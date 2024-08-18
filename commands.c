@@ -6,9 +6,9 @@
  * @argv: The array to store the words
  * @max_args: Maximum number of arguments
  *
- * Description: Uses strtok to split the input string into words, storing each
- * word in the argv array. The function limits the number of arguments to
- * max_args - 1 to leave space for a NULL terminator.
+ * Description: Uses strtok to split the input string into words,
+ * storing each word in the argv array. The function limits the number
+ * of arguments to max_args - 1 to leave space for a NULL terminator.
  */
 void split_string_to_av(char *str, char *argv[], int max_args)
 {
@@ -63,17 +63,15 @@ char *find_executable_in_path(const char *command, char *path_copy)
 }
 
 /**
- * execute_command - Executes a command with its arguments
+ * get_command_full_path - Gets the full path of the command
  * @argv: Array of command and arguments
  * @envp: Environment variables
  *
- * Description: This function forks a process and executes a command using
- * execve. The parent process waits for the child to finish.
+ * Return: The full path of the command, or NULL if not found
  */
-void execute_command(char *argv[], char *envp[])
+char *get_command_full_path(char *argv[], char *envp[])
 {
-	pid_t pid;
-	char *path = NULL, *full_path = NULL;
+	char *full_path = NULL;
 
 	if (strchr(argv[0], '/') != NULL)
 	{
@@ -81,27 +79,32 @@ void execute_command(char *argv[], char *envp[])
 	}
 	else
 	{
-		path = _getenv("PATH", envp);
-
-		if (path != NULL)
-		{
-			char *path_copy = strdup(path);
-			full_path = find_executable_in_path(argv[0], path_copy);
-			free(path_copy);
-		}
+		full_path = find_executable_in_path(argv[0], strdup(_getenv("PATH", envp)));
 
 		if (full_path == NULL)
 		{
 			fprintf(stderr, "%s: command not found\n", argv[0]);
-			return;
 		}
 	}
 
-	pid = fork();
+	return (full_path);
+}
+
+/**
+ * fork_and_execute - Forks and executes a command
+ * @full_path: The full path to the executable
+ * @argv: Array of command and arguments
+ * @envp: Environment variables
+ */
+void fork_and_execute(char *full_path, char *argv[], char *envp[])
+{
+	pid_t pid = fork();
+
 	if (pid == -1)
 	{
 		perror("fork");
-		free(full_path);
+		if (full_path != argv[0])
+			free(full_path);
 		return;
 	}
 
@@ -110,7 +113,8 @@ void execute_command(char *argv[], char *envp[])
 		if (execve(full_path, argv, envp) == -1)
 		{
 			perror("execve");
-			free(full_path);
+			if (full_path != argv[0])
+				free(full_path);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -122,3 +126,22 @@ void execute_command(char *argv[], char *envp[])
 	if (full_path != argv[0])
 		free(full_path);
 }
+
+/**
+ * execute_command - Executes a command with its arguments
+ * @argv: Array of command and arguments
+ * @envp: Environment variables
+ *
+ * Description: This function forks a process and executes a command using
+ * execve. The parent process waits for the child to finish.
+ */
+void execute_command(char *argv[], char *envp[])
+{
+	char *full_path = get_command_full_path(argv, envp);
+
+	if (full_path != NULL)
+	{
+		fork_and_execute(full_path, argv, envp);
+	}
+}
+

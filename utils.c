@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * print_path_directories - Prints each directory in the PATH envnt variable
+ * print_path_directories - Prints each directory in the PATH env variable
  * @envp: Environment variables
  */
 void print_path_directories(char *envp[])
