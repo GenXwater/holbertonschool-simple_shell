@@ -29,7 +29,6 @@ void fork_and_wait(void);
 void display_man_page(const char *filename);
 int handle_builtin_commands(char *cmd_argv[], char *envp[]);
 void execute_man_command(char *man_command[]);
-void free_resources(char *cmd_argv[], char *line);
+void free_list(list_t *head);
 
-#endif /* MAIN_H */
-
+#endif
