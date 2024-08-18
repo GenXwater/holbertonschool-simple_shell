@@ -16,18 +16,22 @@ int main(int argc, char *argv[], char *envp[])
 	char *cmd_argv[10];
 	int max_args = 10;
 
-	(void)argc;
+	(void)argc;  /* Marking unused parameters */
 	(void)argv;
 
 	while (1)
 	{
-		printf("$ ");
+		if (isatty(STDIN_FILENO))
+			printf("$ ");  /* Display prompt in interactive mode */
+
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
-			printf("\n");
+			if (isatty(STDIN_FILENO))
+				printf("\n");  /* Print newline in interactive mode */
 			break;
 		}
+
 		line[strcspn(line, "\n")] = 0;  /* Remove the newline character */
 		split_string_to_av(line, cmd_argv, max_args);
 
@@ -105,36 +109,5 @@ void execute_man_command(char *man_command[])
 	{
 		wait(NULL);
 	}
-}
-
-/**
- * display_man_page - Displays the man page for the simple shell
- * @filename: The name of the man file to display
- */
-void display_man_page(const char *filename)
-{
-	int fd;
-	char buffer[1024];
-	ssize_t bytes_read;
-
-	fd = open(filename, O_RDONLY);
-	if (fd == -1)
-	{
-		perror("open");
-		return;
-	}
-
-	while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0)
-	{
-		buffer[bytes_read] = '\0';  /* Null-terminate the buffer */
-		printf("%s", buffer);
-	}
-
-	if (bytes_read == -1)
-	{
-		perror("read");
-	}
-
-	close(fd);
 }
 
