@@ -21,7 +21,7 @@ void print_path_directories(char *envp[])
 		dir = strtok(NULL, ":");
 	}
 
-	free(path);  /* Free the duplicated string */
+	free(path);
 }
 
 /**
@@ -46,7 +46,10 @@ list_t *build_path_list(char *envp[])
 	{
 		new_node = malloc(sizeof(list_t));
 		if (!new_node)
+		{
+			free_list(head);
 			return (NULL);
+		}
 
 		new_node->dir = strdup(dir);
 		new_node->next = NULL;
@@ -65,7 +68,7 @@ list_t *build_path_list(char *envp[])
 }
 
 /**
- * free_list - Frees a linked list
+ * free_list - Frees a linked list of directories
  * @head: Pointer to the head of the list
  */
 void free_list(list_t *head)
