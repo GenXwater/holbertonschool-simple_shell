@@ -2,101 +2,78 @@
 
 ## Description
 
-Ce projet est une implémentation simplifiée d'un shell en C. Un shell est une interface de ligne de commande qui permet aux utilisateurs d'interagir avec le système d'exploitation en tapant des commandes. Ce projet vise à fournir une compréhension de base des concepts sous-jacents à un shell Unix, tels que la gestion des processus, l'exécution des commandes, et la manipulation des variables d'environnement.
+The Simple Shell is a basic UNIX command-line interpreter that replicates the behavior of the shell (sh). It allows users to execute commands, handle the environment, and navigate the file system.
 
-## Fonctionnalités
+## Features
 
-- **Exécution de commandes** : Le shell peut exécuter n'importe quelle commande en fournissant le chemin complet de l'exécutable.
-- **Gestion des variables d'environnement** :
-  - `printenv` : Affiche toutes les variables d'environnement.
-  - `setenv` : Définit ou modifie une variable d'environnement.
-  - `unsetenv` : Supprime une variable d'environnement.
-  - `showpath` : Affiche les répertoires contenus dans la variable `PATH`.
-- **Support des commandes internes** :
-  - `exit` : Quitte le shell.
-  - `printenv` : Affiche toutes les variables d'environnement.
-  - `setenv VAR_NAME VAR_VALUE` : Définit ou modifie une variable d'environnement.
-  - `unsetenv VAR_NAME` : Supprime une variable d'environnement.
-  - `showpath` : Affiche les répertoires dans le `PATH`.
+- Execute commands with their full path or relative path.
+- Handle command-line arguments.
+- Implement built-in commands such as `exit` and `env`.
+- Support for environment variable management (`setenv`, `unsetenv`, `printenv`).
+- Basic error handling.
+- Interactive and non-interactive modes.
 
 ## Installation
 
-1. Clonez le dépôt :
+1. Clone the repository:
 
    ```bash
-   git clone https://github.com/votre-utilisateur/simple_shell.git
+   git clone https://github.com/yourusername/holbertonschool-simple_shell.git
+   cd holbertonschool-simple_shell
    ```
 
-2. Accédez au répertoire du projet :
+2. Compile the shell:
 
    ```bash
-   cd simple_shell
+   gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
    ```
 
-3. Compilez le programme :
+3. Run the shell:
 
-   ```bash
-   gcc -Wall -Wextra -Werror -pedantic -std=gnu89 main.c commands.c processes.c environment.c utils.c -o simple_shell
-   ```
+   - Interactive mode:
+     ```bash
+     ./hsh
+     ```
 
-## Utilisation
+   - Non-interactive mode:
+     ```bash
+     echo "/bin/ls" | ./hsh
+     ```
 
-1. Exécutez le shell en tapant la commande suivante :
+## Built-in Commands
 
-   ```bash
-   ./simple_shell
-   ```
+- **`exit`**: Exits the shell.
+- **`env`**: Prints the current environment.
+- **`setenv`**: Sets or updates an environment variable.
+  - Usage: `setenv VARIABLE_NAME VALUE`
+- **`unsetenv`**: Unsets an environment variable.
+  - Usage: `unsetenv VARIABLE_NAME`
+- **`showpath`**: Displays all directories in the PATH environment variable.
 
-2. Vous verrez apparaître une invite `"$ "` à laquelle vous pouvez entrer des commandes.
+## Examples
 
-### Exemples de commandes
-
-- **Exécuter une commande avec son chemin complet** :
-
+- Running a command:
   ```bash
   $ /bin/ls
+  file1 file2 file3
   ```
 
-- **Afficher toutes les variables d'environnement** :
-
-  ```bash
-  $ printenv
-  ```
-
-- **Définir une variable d'environnement** :
-
+- Setting an environment variable:
   ```bash
   $ setenv MY_VAR HelloWorld
   ```
 
-- **Supprimer une variable d'environnement** :
+- Displaying environment variables:
+  ```bash
+  $ env
+  ```
 
+- Removing an environment variable:
   ```bash
   $ unsetenv MY_VAR
   ```
 
-- **Afficher les répertoires du PATH** :
-
-  ```bash
-  $ showpath
-  ```
-
-- **Quitter le shell** :
-
+- Exiting the shell:
   ```bash
   $ exit
   ```
-
-## Structure du projet
-
-- `main.c` : Fichier principal qui gère l'entrée de l'utilisateur et coordonne les autres modules.
-- `commands.c` : Contient les fonctions pour traiter et exécuter les commandes utilisateur.
-- `processes.c` : Gère la création et la gestion des processus (fork, wait).
-- `environment.c` : Gère les variables d'environnement, y compris `setenv`, `unsetenv`, et `printenv`.
-- `utils.c` : Fonctions utilitaires pour manipuler les chaînes de caractères et les variables d'environnement.
-- `main.h` : Fichier d'en-tête contenant les déclarations de fonctions et de structures.
-
-
-## Auteurs
-
-- EVRADE, DIARRA, GENXWATER
