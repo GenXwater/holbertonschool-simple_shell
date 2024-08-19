@@ -12,6 +12,7 @@ int main(int argc, char *argv[], char *envp[])
 {
 	char *line = NULL;
 	size_t len = 0;
+	int i;
 	ssize_t nread;
 	char *cmd_argv[2]; /* Only one word, no arguments */
 	int max_args = 1;
@@ -28,7 +29,7 @@ int main(int argc, char *argv[], char *envp[])
 			printf("\n");
 			break; /* Handle EOF (Ctrl+D) */
 		}
-		for (int i = 0; i < nread; i++)
+		for (i = 0; i < nread; i++)
 		{
 			if (line[i] == '\n')
 			{
