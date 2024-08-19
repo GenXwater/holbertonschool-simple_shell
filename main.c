@@ -1,4 +1,5 @@
 #include "main.h"
+
 /**
  * main - Entry point of the simple shell
  * @argc: Argument count
@@ -11,31 +12,31 @@ int main(int argc, char *argv[], char *envp[])
 {
 	char *line = NULL;
 	size_t len = 0;
+	int i = 0;
 	ssize_t nread;
 	char *cmd_argv[10];
 	int max_args = 10;
-
-	(void)argc;
 	(void)argc;  /* Marking unused parameters */
 	(void)argv;
 
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");  /* Display prompt in interactive mode */
-
+		printf("$ ");
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
 			printf("\n");
-			if (isatty(STDIN_FILENO))
-				printf("\n");  /* Print newline in interactive mode */
 			break;
 		}
-
-		line[strcspn(line, "\n")] = 0;  /* Remove the newline character */
+		while (line[i] != '\n' && line[i] != '\0')
+		{
+			i++;
+		}
+		if (line[i] == '\n')
+		{
+			line[i] = '\0';
+		}
 		split_string_to_av(line, cmd_argv, max_args);
-
 		if (cmd_argv[0] == NULL)
 			continue;
 		if (handle_builtin_commands(cmd_argv, envp) == 1)
@@ -45,6 +46,7 @@ int main(int argc, char *argv[], char *envp[])
 	free(line);
 	return (0);
 }
+
 /**
  * handle_builtin_commands - Handles the built-in commands for the shell
  * @cmd_argv: Array of command arguments
@@ -82,6 +84,7 @@ int handle_builtin_commands(char *cmd_argv[], char *envp[])
 			strcmp(cmd_argv[1], "simple_shell") == 0)
 	{
 		char *man_command[] = {"/bin/man", "./simple-shell.1", NULL};
+
 		execute_man_command(man_command);
 
 		return (1);
