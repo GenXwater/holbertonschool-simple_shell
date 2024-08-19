@@ -69,9 +69,11 @@ char *find_executable_in_path(const char *command, char *path_copy)
  *
  * Return: The full path of the command, or NULL if not found
  */
+
 char *get_command_full_path(char *argv[], char *envp[])
 {
 	char *full_path = NULL;
+	char *path_copy = NULL;
 
 	if (strchr(argv[0], '/') != NULL)
 	{
@@ -79,12 +81,15 @@ char *get_command_full_path(char *argv[], char *envp[])
 	}
 	else
 	{
-		full_path = find_executable_in_path(argv[0], strdup(_getenv("PATH", envp)));
+		path_copy = strdup(_getenv("PATH", envp));
+		full_path = find_executable_in_path(argv[0], path_copy);
 
 		if (full_path == NULL)
 		{
 			fprintf(stderr, "%s: command not found\n", argv[0]);
 		}
+
+		free(path_copy);
 	}
 
 	return (full_path);
