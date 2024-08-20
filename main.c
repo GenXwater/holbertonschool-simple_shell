@@ -19,14 +19,16 @@ int main(int argc, char *argv[], char *envp[])
 	(void)argv;
 	while (1)
 	{
-		printf("$ ");
+		if (isatty(STDIN_FILENO))
+			printf("$ ");
+
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
 			printf("\n");
 			break; /* Handle EOF (Ctrl+D) */
 		}
-		for (int i = 0; i < nread; i++)
+		for (i = 0; i < nread; i++)
 			for (i = 0; i < nread; i++)
 			{
 				if (line[i] == '\n')
