@@ -46,11 +46,7 @@ list_t *build_path_list(char *envp[])
 	{
 		new_node = malloc(sizeof(list_t));
 		if (!new_node)
-		{
-			free_list(head);  /* Free previously allocated nodes */
-			free(path);
 			return (NULL);
-		}
 
 		new_node->dir = strdup(dir);
 		new_node->next = NULL;
@@ -67,22 +63,3 @@ list_t *build_path_list(char *envp[])
 	free(path);
 	return (head);
 }
-
-/**
- * free_list - Frees a linked list
- * @head: Pointer to the head of the list
- */
-void free_list(list_t *head)
-{
-	list_t *current, *next;
-
-	current = head;
-	while (current != NULL)
-	{
-		next = current->next;
-		free(current->dir);
-		free(current);
-		current = next;
-	}
-}
-
