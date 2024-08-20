@@ -29,5 +29,6 @@ void fork_and_wait(void);
 void display_man_page(const char *filename);
 int handle_builtin_commands(char *cmd_argv[], char *envp[]);
 void execute_man_command(char *man_command[]);
+char *find_executable_in_path(char *command, char *path);
 
 #endif
