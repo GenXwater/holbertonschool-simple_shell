@@ -1,15 +1,10 @@
 #include "main.h"
-#include <string.h>
 
 /**
  * split_string_to_av - Splits a string into an array of words
  * @str: The string to split
  * @argv: The array to store the words
  * @max_args: Maximum number of arguments
- *
- * Description: Uses strtok to split the input string into words, storing each
- * word in the argv array. The function limits the number of arguments to
- * max_args - 1 to leave space for a NULL terminator.
  */
 void split_string_to_av(char *str, char *argv[], int max_args)
 {
@@ -27,38 +22,30 @@ void split_string_to_av(char *str, char *argv[], int max_args)
 }
 
 /**
- * find_executable_in_path - Finds the full path of an executable
- * @command: The command to search for
- * @envp: The environment variables
- *
- * Return: The full path of the executable, or NULL if not found
+ * find_executable_in_path - Finds an executable in the PATH
+ * @command: The command to find
+ * @path: The PATH environment variable
+ * 
+ * Return: Full path to the executable if found, otherwise NULL
  */
-char *find_executable_in_path(char *command, char *envp[])
+char *find_executable_in_path(char *command, char *path)
 {
-	char *path = _getenv("PATH", envp);
 	char *dir;
-	char *full_path = malloc(1024);  /* Allocate a fixed buffer size */
+	char *full_path = malloc(4096); /* Maximum length for a path */
+	struct stat st;
 
-	if (!path || !full_path)
+	if (!full_path)
 		return (NULL);
 
-	path = strdup(path);
 	dir = strtok(path, ":");
-
 	while (dir)
 	{
-		snprintf(full_path, 1024, "%s/%s", dir, command);
-
-		if (access(full_path, X_OK) == 0)
-		{
-			free(path);
+		snprintf(full_path, 4096, "%s/%s", dir, command);
+		if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
 			return (full_path);
-		}
-
 		dir = strtok(NULL, ":");
 	}
 
-	free(path);
 	free(full_path);
 	return (NULL);
 }
@@ -67,9 +54,6 @@ char *find_executable_in_path(char *command, char *envp[])
  * execute_command - Executes a command with its arguments
  * @argv: Array of command and arguments
  * @envp: Environment variables
- *
- * Description: This function forks a process and executes a command using
- * execve. The parent process waits for the child to finish.
  */
 void execute_command(char *argv[], char *envp[])
 {
@@ -77,18 +61,27 @@ void execute_command(char *argv[], char *envp[])
 	int status;
 	char *full_path;
 
-	full_path = find_executable_in_path(argv[0], envp);
-	if (!full_path)
+	if (argv[0][0] == '/')
 	{
-		fprintf(stderr, "%s: command not found\n", argv[0]);
-		return;
+		full_path = argv[0]; /* Use full path if given */
+	}
+	else
+	{
+		char *path = _getenv("PATH", envp);
+		char *path_copy = strdup(path);
+		full_path = find_executable_in_path(argv[0], path_copy);
+		free(path_copy);
+		if (!full_path)
+		{
+			fprintf(stderr, "%s: command not found\n", argv[0]);
+			return;
+		}
 	}
 
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork");
-		free(full_path);
 		return;
 	}
 
@@ -97,16 +90,15 @@ void execute_command(char *argv[], char *envp[])
 		if (execve(full_path, argv, envp) == -1)
 		{
 			perror("execve");
-			free(full_path);
 			exit(EXIT_FAILURE);
 		}
 	}
 	else
 	{
 		wait(&status);
+		if (full_path != argv[0])
+			free(full_path);
 	}
-
-	free(full_path);
 }
 
 /**
@@ -150,6 +142,5 @@ int handle_builtin_commands(char *cmd_argv[], char *envp[])
 		execute_man_command(man_command);
 		return (1);
 	}
-
 	return (0);
 }
