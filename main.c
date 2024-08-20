@@ -16,7 +16,7 @@ int main(int argc, char *argv[], char *envp[])
 	char *cmd_argv[10];
 	int max_args = 10;
 
-	(void)argc;
+	(void)argc;  /* Marking unused parameters */
 	(void)argv;
 
 	while (1)
@@ -26,17 +26,18 @@ int main(int argc, char *argv[], char *envp[])
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
-			free(line);
+			printf("\n");
 			break; /* Handle EOF (Ctrl+D) */
 		}
 
-		line[nread - 1] = '\0'; /* Remove newline character */
+		line[strcspn(line, "\n")] = 0;  /* Remove the newline character */
+
 		split_string_to_av(line, cmd_argv, max_args);
 
 		if (cmd_argv[0] == NULL)
 			continue;
 
-		if (handle_builtin_commands(cmd_argv, envp))
+		if (handle_builtin_commands(cmd_argv, envp) == 1)
 			continue;
 
 		execute_command(cmd_argv, envp);
