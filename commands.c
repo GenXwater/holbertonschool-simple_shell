@@ -25,7 +25,7 @@ void split_string_to_av(char *str, char *argv[], int max_args)
  * find_executable_in_path - Finds an executable in the PATH
  * @command: The command to find
  * @path: The PATH environment variable
- * 
+ *
  * Return: Full path to the executable if found, otherwise NULL
  */
 char *find_executable_in_path(char *command, char *path)
@@ -59,16 +59,13 @@ void execute_command(char *argv[], char *envp[])
 {
 	pid_t pid;
 	int status;
-	char *full_path;
+	char *full_path = (argv[0][0] == '/') ? argv[0] : NULL;
 
-	if (argv[0][0] == '/')
-	{
-		full_path = argv[0]; /* Use full path if given */
-	}
-	else
+	if (!full_path)
 	{
 		char *path = _getenv("PATH", envp);
 		char *path_copy = strdup(path);
+
 		full_path = find_executable_in_path(argv[0], path_copy);
 		free(path_copy);
 		if (!full_path)
