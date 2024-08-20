@@ -40,4 +40,3 @@ void fork_and_wait(void)
 		printf("Child process ended\n");
 	}
 }
-
