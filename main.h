@@ -29,8 +29,5 @@ void fork_and_wait(void);
 void display_man_page(const char *filename);
 int handle_builtin_commands(char *cmd_argv[], char *envp[]);
 void execute_man_command(char *man_command[]);
-void read_input(char **line, size_t *len);
-void process_command(char *line, char *cmd_argv[], int max_args, char *envp[]);
-void free_list(list_t *head);
 
 #endif
