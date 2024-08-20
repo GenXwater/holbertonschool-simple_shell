@@ -1,8 +1,8 @@
 #include "main.h"
 
 /**
- * execute_man_command - Executes the man command.
- * @man_command: Array containing the man command and its arguments.
+ * execute_man_command - Executes the man command
+ * @man_command: Array containing the man command and its arguments
  */
 void execute_man_command(char *man_command[])
 {
@@ -19,8 +19,8 @@ void execute_man_command(char *man_command[])
 }
 
 /**
- * display_man_page - Displays the man page for the simple shell.
- * @filename: The name of the man file to display.
+ * display_man_page - Displays the man page for the simple shell
+ * @filename: The name of the man file to display
  */
 void display_man_page(const char *filename)
 {
