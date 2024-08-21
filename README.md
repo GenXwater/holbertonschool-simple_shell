@@ -24,7 +24,7 @@ This project is a simple Unix shell implemented in C as part of the Holberton Sc
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/simple_shell.git
+    git clone https://github.com/yourusername/holberton-simple_shell.git
     cd simple_shell
     ```
 
