@@ -6,7 +6,7 @@
  *
  * Return: The length of the string
  */
-int string_length(char *str)
+int string_length(const char *str)
 {
 	int len = 0;
 
@@ -14,23 +14,6 @@ int string_length(char *str)
 		len++;
 
 	return (len);
-}
-
-/**
- * copy_string - Copies a string from source to destination
- * @dest: Pointer to the destination buffer where the content is to be copied
- * @src: Pointer to the source string to be copied
- * Return: void
- */
-void copy_string(char *dest, char *src)
-{
-	while (*src)
-	{
-		*dest = *src;
-		dest++;
-		src++;
-	}
-	*dest = '\0';
 }
 
 /**

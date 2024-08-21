@@ -39,7 +39,7 @@ void print_path_directories(char *envp[]);
 list_t *build_path_list(char *envp[]);
 void free_path_list(list_t *head);
 list_t *create_path_node(char *dir);
-int string_length(char *str);
+int string_length(const char *str);
 void copy_string(char *dest, char *src);
 
 #endif
