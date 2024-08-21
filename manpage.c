@@ -6,11 +6,23 @@
  */
 void execute_man_command(char *man_command[])
 {
-	if (fork() == 0)
+	pid_t pid;
+	char *envp[] = {NULL};  /* Environnement vide pour execve */
+
+	pid = fork();
+	if (pid == -1)
 	{
-		execvp(man_command[0], man_command);
-		perror("execvp");
-		exit(EXIT_FAILURE);
+		perror("fork");
+		return;
+	}
+
+	if (pid == 0)
+	{
+		if (execve(man_command[0], man_command, envp) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
 	}
 	else
 	{
@@ -46,5 +58,8 @@ void display_man_page(const char *filename)
 		perror("read");
 	}
 
-	close(fd);
+	if (close(fd) == -1)
+	{
+		perror("close");
+	}
 }
