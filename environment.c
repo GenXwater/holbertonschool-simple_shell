@@ -69,7 +69,7 @@ int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 		i++;
 	}
 
-	new_env = malloc(strlen(name) + strlen(value) + 2);
+	new_env = malloc(string_length(name) + string_length(value) + 2);
 	if (!new_env)
 	{
 		perror("malloc");
