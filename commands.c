@@ -72,7 +72,7 @@ char *get_full_path(char *command, char *envp[])
 		return (NULL);
 	}
 
-	path_copy = malloc(strlen(path) + 1);
+	path_copy = malloc(string_length(path) + 1);
 	if (!path_copy)
 	{
 		perror("malloc");
