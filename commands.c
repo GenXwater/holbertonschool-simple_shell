@@ -1,10 +1,4 @@
 #include "main.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/wait.h>
 
 /**
  * split_string_to_av - Splits a string into an array of words
@@ -14,17 +8,17 @@
  */
 void split_string_to_av(char *str, char *argv[], int max_args)
 {
-    int i = 0;
-    char *token;
+	int i = 0;
+	char *token;
 
-    token = strtok(str, " \t\n");
-    while (token && i < max_args - 1)
-    {
-        argv[i] = token;
-        i++;
-        token = strtok(NULL, " \t\n");
-    }
-    argv[i] = NULL;
+	token = strtok(str, " \t\n");
+	while (token && i < max_args - 1)
+	{
+		argv[i] = token;
+		i++;
+		token = strtok(NULL, " \t\n");
+	}
+	argv[i] = NULL;
 }
 
 /**
@@ -36,25 +30,60 @@ void split_string_to_av(char *str, char *argv[], int max_args)
  */
 char *find_executable_in_path(char *command, char *path)
 {
-    char *dir;
-    char *full_path = malloc(4096); /* Maximum length for a path */
-    struct stat st;
+	char *dir;
+	char *full_path = malloc(4096); /* Maximum length for a path */
+	struct stat st;
 
-    if (!full_path)
-        return (NULL);
+	if (!full_path)
+	{
+		perror("malloc");
+		return (NULL);
+	}
 
-    dir = strtok(path, ":");
-    while (dir)
-    {
-        /* Use sprintf instead of snprintf */
-        sprintf(full_path, "%s/%s", dir, command);
-        if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
-            return (full_path);
-        dir = strtok(NULL, ":");
-    }
+	dir = strtok(path, ":");
+	while (dir)
+	{
+		sprintf(full_path, "%s/%s", dir, command);
+		if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
+			return (full_path);
+		dir = strtok(NULL, ":");
+	}
 
-    free(full_path);
-    return (NULL);
+	printf("find_executable_in_path: command '%s' not found in PATH\n", command);
+	free(full_path);
+	return (NULL);
+}
+
+/**
+ * get_full_path - Retrieves the full path of a command
+ * @command: The command to find
+ * @envp: Environment variables
+ *
+ * Return: Full path to the command if found, otherwise NULL
+ */
+char *get_full_path(char *command, char *envp[])
+{
+	char *path = _getenv("PATH", envp);
+	char *path_copy, *full_path;
+
+	if (!path)
+	{
+		printf("get_full_path: PATH variable not found\n");
+		return (NULL);
+	}
+
+	path_copy = malloc(strlen(path) + 1);
+	if (!path_copy)
+	{
+		perror("malloc");
+		return (NULL);
+	}
+	strcpy(path_copy, path);
+
+	full_path = find_executable_in_path(command, path_copy);
+	free(path_copy);
+
+	return (full_path);
 }
 
 /**
@@ -64,53 +93,38 @@ char *find_executable_in_path(char *command, char *path)
  */
 void execute_command(char *argv[], char *envp[])
 {
-    pid_t pid;
-    int status;
-    char *full_path = (argv[0][0] == '/') ? argv[0] : NULL;
+	pid_t pid;
+	int status;
+	char *full_path = (argv[0][0] == '/')
+		? argv[0] : get_full_path(argv[0], envp);
 
-    if (!full_path)
-    {
-        char *path = _getenv("PATH", envp);
+	if (!full_path)
+	{
+		printf("execute_command: command '%s' not found\n", argv[0]);
+		return;
+	}
 
-        /* Manually duplicate the path */
-        char *path_copy = malloc(strlen(path) + 1);
-        if (!path_copy)
-        {
-            perror("malloc");
-            return;
-        }
-        strcpy(path_copy, path);
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return;
+	}
 
-        full_path = find_executable_in_path(argv[0], path_copy);
-        free(path_copy);
-        if (!full_path)
-        {
-            fprintf(stderr, "%s: command not found\n", argv[0]);
-            return;
-        }
-    }
-
-    pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        return;
-    }
-
-    if (pid == 0)
-    {
-        if (execve(full_path, argv, envp) == -1)
-        {
-            perror("execve");
-            exit(EXIT_FAILURE);
-        }
-    }
-    else
-    {
-        wait(&status);
-        if (full_path != argv[0])
-            free(full_path);
-    }
+	if (pid == 0)
+	{
+		if (execve(full_path, argv, envp) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		wait(&status);
+		if (full_path != argv[0])
+			free(full_path);
+	}
 }
 
 /**
@@ -122,38 +136,37 @@ void execute_command(char *argv[], char *envp[])
  */
 int handle_builtin_commands(char *cmd_argv[], char *envp[])
 {
-    if (strcmp(cmd_argv[0], "exit") == 0)
-    {
-        exit(0);
-    }
-    else if (strcmp(cmd_argv[0], "printenv") == 0)
-    {
-        print_environment(envp);
-        return (1);
-    }
-    else if (strcmp(cmd_argv[0], "setenv") == 0 && cmd_argv[1] && cmd_argv[2])
-    {
-        _setenv(cmd_argv[1], cmd_argv[2], 1, envp);
-        return (1);
-    }
-    else if (strcmp(cmd_argv[0], "unsetenv") == 0 && cmd_argv[1])
-    {
-        _unsetenv(cmd_argv[1], envp);
-        return (1);
-    }
-    else if (strcmp(cmd_argv[0], "showpath") == 0)
-    {
-        print_path_directories(envp);
-        return (1);
-    }
-    else if (strcmp(cmd_argv[0], "man") == 0 && cmd_argv[1] &&
-             strcmp(cmd_argv[1], "simple_shell") == 0)
-    {
-        char *man_command[] = {"/bin/man", "./simple-shell.1", NULL};
+	if (strcmp(cmd_argv[0], "exit") == 0)
+	{
+		exit(0);
+	}
+	else if (strcmp(cmd_argv[0], "printenv") == 0)
+	{
+		print_environment(envp);
+		return (1);
+	}
+	else if (strcmp(cmd_argv[0], "setenv") == 0 && cmd_argv[1] && cmd_argv[2])
+	{
+		_setenv(cmd_argv[1], cmd_argv[2], 1, envp);
+		return (1);
+	}
+	else if (strcmp(cmd_argv[0], "unsetenv") == 0 && cmd_argv[1])
+	{
+		_unsetenv(cmd_argv[1], envp);
+		return (1);
+	}
+	else if (strcmp(cmd_argv[0], "showpath") == 0)
+	{
+		print_path_directories(envp);
+		return (1);
+	}
+	else if (strcmp(cmd_argv[0], "man") == 0 && cmd_argv[1] &&
+			strcmp(cmd_argv[1], "simple_shell") == 0)
+	{
+		char *man_command[] = {"/bin/man", "./simple-shell.1", NULL};
 
-        execute_man_command(man_command);
-        return (1);
-    }
-    return (0);
+		execute_man_command(man_command);
+		return (1);
+	}
+	return (0);
 }
-
