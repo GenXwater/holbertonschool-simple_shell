@@ -1,11 +1,14 @@
 #include "main.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /**
  * _getenv - Custom function to get the value of an environment variable
  * @name: Name of the environment variable
  * @envp: Environment variables
  *
- * Return: Pointertothe value of the environment variable, or NULL if not found
+ * Return: Ptr to the value of the environment variable, or NULL if not found
  */
 char *_getenv(const char *name, char *envp[])
 {
@@ -68,7 +71,10 @@ int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 
 	new_env = malloc(strlen(name) + strlen(value) + 2);
 	if (!new_env)
+	{
+		perror("malloc");
 		return (-1);
+	}
 
 	sprintf(new_env, "%s=%s", name, value);
 	envp[i] = new_env;
@@ -103,5 +109,7 @@ int _unsetenv(const char *name, char *envp[])
 		}
 		i++;
 	}
+
+	printf("_unsetenv: %s not found\n", name);
 	return (-1);
 }
