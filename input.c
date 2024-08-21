@@ -13,11 +13,13 @@ void process_command(char *line, char *envp[])
 	split_string_to_av(line, cmd_argv, max_args);
 
 	if (cmd_argv[0] == NULL)
+	{
+		printf("process_command: Empty or invalid command\n");
 		return;
+	}
 
 	if (handle_builtin_commands(cmd_argv, envp) == 1)
 		return;
 
 	execute_command(cmd_argv, envp);
 }
-
