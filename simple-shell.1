@@ -1,124 +1,87 @@
-
-### man_1_simple_shell
-
-```man
-.TH SIMPLE_SHELL 1 "August 2024" "1.0" "Simple Shell Manual"
+.TH simple_shell 1 "August 2024" "1.0" "Simple Shell Manual"
 
 .SH NAME
-simple_shell \- A simple shell implementation in C
+simple_shell \- A simple Unix shell implementation
 
 .SH SYNOPSIS
 .B simple_shell
-.RI [options]
+[OPTION]... 
 
 .SH DESCRIPTION
 .B simple_shell
-is a basic shell that allows the execution of commands with their full path, manages environment variables, and supports a few built-in commands.
+is a basic Unix shell implemented in C as part of the Holberton School curriculum. It provides a command-line interface where users can execute commands, manage environment variables, and navigate the file system.
 
 .SH FEATURES
-The
-.B simple_shell
-supports the following features:
-
 .IP \[bu] 2
-Execute commands with their full path.
+Execute system commands like \fBls\fP, \fBpwd\fP, \fBecho\fP, etc.
 .IP \[bu] 2
-Manipulate environment variables with built-in commands like
-.BR printenv ,
-.BR setenv ,
-and
-.BR unsetenv .
+Built-in commands:
+.RS 4
 .IP \[bu] 2
-Display directories in the PATH environment variable with the
-.B showpath
-command.
+\fBexit\fP \- Exit the shell.
+.IP \[bu] 2
+\fBprintenv\fP \- Display all environment variables.
+.IP \[bu] 2
+\fBsetenv\fP \- Set or modify an environment variable.
+.IP \[bu] 2
+\fBunsetenv\fP \- Remove an environment variable.
+.IP \[bu] 2
+\fBshowpath\fP \- Display the directories in the \fBPATH\fP variable.
+.IP \[bu] 2
+\fBman simple_shell\fP \- Display the manual page for this shell.
+.RE
+.IP \[bu] 2
+Environment variable management: Set, unset, and display environment variables.
+.IP \[bu] 2
+Command execution: Supports command execution with arguments and options.
+.IP \[bu] 2
+Process management: Handles process creation and waits for child processes to finish.
+.IP \[bu] 2
+Memory management: Properly allocates and frees memory to avoid leaks.
 
-.SH COMMANDS
-The following commands are built into the
-.B simple_shell
-:
-
-.TP
-.B printenv
-Prints all the current environment variables.
-
-.TP
-.B setenv
-.BR "setenv " "VAR_NAME VAR_VALUE"
-Sets or updates the value of the environment variable
-.I VAR_NAME
-to
-.I VAR_VALUE
-.
-
-.TP
-.B unsetenv
-.BR "unsetenv " "VAR_NAME"
-Removes the environment variable
-.I VAR_NAME
-from the environment.
-
-.TP
-.B showpath
-Displays all directories in the PATH environment variable, one per line.
-
-.TP
-.B exit
-Exits the shell.
+.SH OPTIONS
+The \fBsimple_shell\fP does not take any options. Commands and arguments are entered interactively.
 
 .SH EXAMPLES
-Here are some examples of how to use
-.B simple_shell
-:
-
-.TP
-Execute a command with its full path:
-
-.nf
-$ /bin/ls
-.fi
-
-.TP
-Set an environment variable:
-
-.nf
-$ setenv MY_VAR HelloWorld
-.fi
-
-.TP
-Display all environment variables:
-
-.nf
-$ env
-.fi
-
-.TP
-Remove an environment variable:
-
-.nf
-$ unsetenv MY_VAR
-.fi
-
-.TP
-Display directories in the PATH:
-
-.nf
-$ showpath
-.fi
-
-.TP
-Exit the shell:
-
-.nf
+To start the shell:
+.PP
+.EX
+$ ./hsh
+.EE
+To run a basic command:
+.PP
+.EX
+$ ls
+.EE
+To exit the shell:
+.PP
+.EX
 $ exit
-.fi
+.EE
+To set an environment variable:
+.PP
+.EX
+$ setenv MYVAR "HelloWorld"
+.EE
+To print environment variables:
+.PP
+.EX
+$ printenv
+.EE
+To unset an environment variable:
+.PP
+.EX
+$ unsetenv MYVAR
+.EE
+
+.SH MEMORY MANAGEMENT
+This shell has been tested for memory leaks using Valgrind. All dynamic memory allocations are properly freed before the shell exits, ensuring that no memory leaks occur during execution.
+
+.SH SEE ALSO
+.BR sh (1),
+.BR bash (1)
 
 .SH AUTHOR
-.B simple_shell
-was developed by
-.BR "Your Name" .
-
-.SH COPYRIGHT
-This manual page is part of the
-.B simple_shell
-project and is distributed under the MIT License.
+.B Diarra, Evrade & GenXwater
+.SH LICENSE
+This project is open-source and available under the MIT License.
