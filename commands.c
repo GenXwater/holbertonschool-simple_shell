@@ -1,49 +1,159 @@
-#include stdio.h
-#include stdlib.h
-#include string.h
-
-#define MAX_TOK 64  // Nombre maximum de tokens, ajustez si nécessaire
+#include "main.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 /**
- * tokenizer - Divise une chaîne d'entrée en un tableau de tokens en utilisant un délimiteur.
- *
- * @temp: Tampon contenant la chaîne à tokeniser.
- * @delim: Délimiteur utilisé pour séparer les tokens.
- *
- * Return: Tableau de chaînes contenant les tokens, ou NULL en cas d'erreur.
+ * split_string_to_av - Splits a string into an array of words
+ * @str: The string to split
+ * @argv: The array to store the words
+ * @max_args: Maximum number of arguments
  */
-char **tokenizer(char *temp, const char *delim)
+void split_string_to_av(char *str, char *argv[], int max_args)
 {
-    char **args = NULL;
-    char *token;
     int i = 0;
+    char *token;
 
-    if (!temp || !delim)
-        return NULL;
-
-    // Allouer la mémoire pour le tableau de tokens
-    args = malloc(sizeof(char *) * MAX_TOK);
-    if (!args)
-        return NULL;
-
-    // Diviser la chaîne en tokens
-    token = strtok(temp, delim);
-    while (token && i < MAX_TOK - 1)
+    token = strtok(str, " \t\n");
+    while (token && i < max_args - 1)
     {
-        args[i] = strdup(token);
-        if (!args[i])
-        {
-            // En cas d'échec d'allocation, libérer la mémoire et retourner NULL
-            for (int j = 0; j < i; j++)
-                free(args[j]);
-            free(args);
-            return NULL;
-        }
+        argv[i] = token;
         i++;
-        token = strtok(NULL, delim);
+        token = strtok(NULL, " \t\n");
     }
-    // Ajouter un pointeur NULL à la fin du tableau
-    args[i] = NULL;
-
-    return args;
+    argv[i] = NULL;
 }
+
+/**
+ * find_executable_in_path - Finds an executable in the PATH
+ * @command: The command to find
+ * @path: The PATH environment variable
+ *
+ * Return: Full path to the executable if found, otherwise NULL
+ */
+char *find_executable_in_path(char *command, char *path)
+{
+    char *dir;
+    char *full_path = malloc(4096); /* Maximum length for a path */
+    struct stat st;
+
+    if (!full_path)
+        return (NULL);
+
+    dir = strtok(path, ":");
+    while (dir)
+    {
+        /* Use sprintf instead of snprintf */
+        sprintf(full_path, "%s/%s", dir, command);
+        if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
+            return (full_path);
+        dir = strtok(NULL, ":");
+    }
+
+    free(full_path);
+    return (NULL);
+}
+
+/**
+ * execute_command - Executes a command with its arguments
+ * @argv: Array of command and arguments
+ * @envp: Environment variables
+ */
+void execute_command(char *argv[], char *envp[])
+{
+    pid_t pid;
+    int status;
+    char *full_path = (argv[0][0] == '/') ? argv[0] : NULL;
+
+    if (!full_path)
+    {
+        char *path = _getenv("PATH", envp);
+
+        /* Manually duplicate the path */
+        char *path_copy = malloc(strlen(path) + 1);
+        if (!path_copy)
+        {
+            perror("malloc");
+            return;
+        }
+        strcpy(path_copy, path);
+
+        full_path = find_executable_in_path(argv[0], path_copy);
+        free(path_copy);
+        if (!full_path)
+        {
+            fprintf(stderr, "%s: command not found\n", argv[0]);
+            return;
+        }
+    }
+
+    pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        return;
+    }
+
+    if (pid == 0)
+    {
+        if (execve(full_path, argv, envp) == -1)
+        {
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        wait(&status);
+        if (full_path != argv[0])
+            free(full_path);
+    }
+}
+
+/**
+ * handle_builtin_commands - Handles the built-in commands for the shell
+ * @cmd_argv: Array of command arguments
+ * @envp: Environment variables
+ *
+ * Return: 1 if a built-in command was executed, 0 otherwise
+ */
+int handle_builtin_commands(char *cmd_argv[], char *envp[])
+{
+    if (strcmp(cmd_argv[0], "exit") == 0)
+    {
+        exit(0);
+    }
+    else if (strcmp(cmd_argv[0], "printenv") == 0)
+    {
+        print_environment(envp);
+        return (1);
+    }
+    else if (strcmp(cmd_argv[0], "setenv") == 0 && cmd_argv[1] && cmd_argv[2])
+    {
+        _setenv(cmd_argv[1], cmd_argv[2], 1, envp);
+        return (1);
+    }
+    else if (strcmp(cmd_argv[0], "unsetenv") == 0 && cmd_argv[1])
+    {
+        _unsetenv(cmd_argv[1], envp);
+        return (1);
+    }
+    else if (strcmp(cmd_argv[0], "showpath") == 0)
+    {
+        print_path_directories(envp);
+        return (1);
+    }
+    else if (strcmp(cmd_argv[0], "man") == 0 && cmd_argv[1] &&
+             strcmp(cmd_argv[1], "simple_shell") == 0)
+    {
+        char *man_command[] = {"/bin/man", "./simple-shell.1", NULL};
+
+        execute_man_command(man_command);
+        return (1);
+    }
+    return (0);
+}
+
