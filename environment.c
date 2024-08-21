@@ -13,7 +13,7 @@
 char *_getenv(const char *name, char *envp[])
 {
 	int i = 0;
-	size_t len = strlen(name);
+	size_t len = string_length(name);
 
 	while (envp[i])
 	{
@@ -53,7 +53,7 @@ void print_environment(char *envp[])
 int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 {
 	int i = 0;
-	size_t len = strlen(name);
+	size_t len = string_length(name);
 	char *new_env;
 
 	while (envp[i])
@@ -93,7 +93,7 @@ int _setenv(const char *name, const char *value, int overwrite, char *envp[])
 int _unsetenv(const char *name, char *envp[])
 {
 	int i = 0;
-	size_t len = strlen(name);
+	size_t len = string_length(name);
 
 	while (envp[i])
 	{

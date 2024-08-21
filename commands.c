@@ -78,7 +78,7 @@ char *get_full_path(char *command, char *envp[])
 		perror("malloc");
 		return (NULL);
 	}
-	strcpy(path_copy, path);
+	copy_string(path_copy, path);
 
 	full_path = find_executable_in_path(command, path_copy);
 	free(path_copy);
