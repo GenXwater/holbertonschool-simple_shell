@@ -5,13 +5,13 @@
  */
 void get_process_ids(void)
 {
-    pid_t my_pid;
-    pid_t my_ppid;
+	pid_t my_pid;
+	pid_t my_ppid;
 
-    my_pid = getpid();
-    my_ppid = getppid();
-    printf("PID: %u\n", my_pid);
-    printf("PPID: %u\n", my_ppid);
+	my_pid = getpid();
+	my_ppid = getppid();
+	printf("PID: %u\n", my_pid);
+	printf("PPID: %u\n", my_ppid);
 }
 
 /**
@@ -19,26 +19,27 @@ void get_process_ids(void)
  */
 void fork_and_wait(void)
 {
-    pid_t child_pid;
-    int status;
+	pid_t child_pid;
+	int status;
 
-    child_pid = fork();
+	child_pid = fork();
 
-    if (child_pid == -1)
-    {
-        perror("fork");
-        return;
-    }
-    if (child_pid == 0)
-    {
-        /* Simulate some work or processing here */
-        printf("Child process: Doing some work\n");
-        _exit(0);  /* Exit immediately from the child process */
-    }
-    else
-    {
-        wait(&status);
-        printf("Parent process: Child process ended\n");
-    }
+	if (child_pid == -1)
+	{
+		perror("fork");
+		return;
+	}
+	if (child_pid == 0)
+	{
+		/* Simulate some work in child process */
+		printf("Child process\n");
+		// Removed sleep, add any other work here if needed
+		_exit(0);  /* Use _exit to exit without cleanup for the child process */
+	}
+	else
+	{
+		wait(&status);
+		printf("Child process ended\n");
+	}
 }
 
